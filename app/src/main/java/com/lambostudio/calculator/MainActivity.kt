@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.lambostudio.calculator.databinding.ActivityMainBinding
+import java.text.DecimalFormat
 
 
 class MainActivity : AppCompatActivity() {
@@ -14,8 +15,6 @@ class MainActivity : AppCompatActivity() {
     var labelString = "" // will contain the string that is entered in the textView
     var savedNum = 0
 
-
-    var isNewOperator = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -40,7 +39,7 @@ class MainActivity : AppCompatActivity() {
 
         for (i in allButtons.indices) {
             allButtons[i].setOnClickListener {
-                didPressNumber(i)
+                pressNumber(i)
                 Log.e("###", "$i")
             }
         }
@@ -54,7 +53,8 @@ class MainActivity : AppCompatActivity() {
 
     fun pressEquals() {
         if (isLastButtonOperator) {
-pressNumber        }
+            // pressNumber()
+        }
         val labelInt = labelString.toInt()// second number
 
         when (currentOperator) {
@@ -79,6 +79,12 @@ pressNumber        }
     }
 
     fun updateText() {
+        if (labelString.length > 8) {
+            pressClears()// reset calc
+            binding.display.text = "tool long"
+            return
+        }
+
         val labelInt = labelString.toInt() // convert it to a number to prevent multiple 0 start
         labelString = labelInt.toString()
 
@@ -86,7 +92,9 @@ pressNumber        }
             savedNum = labelInt
         }
 
-        binding.display.text = labelString
+        val df = DecimalFormat("#,###")
+
+        binding.display.text = df.format(labelInt)
     }
 
     fun changeOperator(operator: Operator) {
@@ -97,7 +105,7 @@ pressNumber        }
         isLastButtonOperator = true
     }
 
-    fun didPressNumber(number: Int) {
+    fun pressNumber(number: Int) {
         val stringValue = number.toString()
 
         if (isLastButtonOperator) {
