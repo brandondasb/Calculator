@@ -7,7 +7,7 @@ import com.lambostudio.calculator.databinding.ActivityMainBinding
 import java.text.DecimalFormat
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), PerformOperation, UpdateUi {
 
     private lateinit var binding: ActivityMainBinding
     var isLastButtonOperator = false
@@ -51,9 +51,9 @@ class MainActivity : AppCompatActivity() {
         binding.ac.setOnClickListener { pressClears() }
     }
 
-    fun pressEquals() {
+    override fun pressEquals() {
         if (isLastButtonOperator) {
-            // pressNumber()
+            return
         }
         val labelInt = labelString.toInt()// second number
 
@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
         binding.display.text = "0"
     }
 
-    fun updateText() {
+    override fun updateText() {
         if (labelString.length > 8) {
             pressClears()// reset calc
             binding.display.text = "tool long"
@@ -93,19 +93,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         val df = DecimalFormat("#,###")
-
         binding.display.text = df.format(labelInt)
     }
 
-    fun changeOperator(operator: Operator) {
-        if (savedNum == 0) {
-            return
-        }
-        currentOperator = operator
-        isLastButtonOperator = true
-    }
 
-    fun pressNumber(number: Int) {
+    override fun pressNumber(number: Int) {
         val stringValue = number.toString()
 
         if (isLastButtonOperator) {
@@ -115,6 +107,14 @@ class MainActivity : AppCompatActivity() {
 
         labelString = "$labelString$stringValue"
         updateText()
+    }
+
+    override fun changeOperator(operator: Operator) {
+        if (savedNum == 0) {
+            return
+        }
+        currentOperator = operator
+        isLastButtonOperator = true
     }
 
 
