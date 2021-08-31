@@ -6,9 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.lambostudio.calculator.databinding.ActivityMainBinding
 import java.text.DecimalFormat
 
+class MainActivity : AppCompatActivity(), PerformOperation, MainView {
 
-class MainActivity : AppCompatActivity(), PerformOperation, UpdateUi {
-
+    private lateinit var presenter: MainActivityPresenter
     private lateinit var binding: ActivityMainBinding
     var isLastButtonOperator = false
     var currentOperator = Operator.NONE
@@ -20,10 +20,11 @@ class MainActivity : AppCompatActivity(), PerformOperation, UpdateUi {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        setupCalculator()
+        presenter = MainActivityPresenter(this, this)
+        presenter.setupUi()
     }
 
-    fun setupCalculator() {
+    override fun setUpCalculator() {
         val allButtons = arrayOf(
             binding.zero,
             binding.one,
@@ -47,8 +48,8 @@ class MainActivity : AppCompatActivity(), PerformOperation, UpdateUi {
         binding.subtract.setOnClickListener { changeOperator(Operator.SUBSTRACT) }
         binding.multiply.setOnClickListener { changeOperator(Operator.MULTIPLY) }
         binding.divide.setOnClickListener { changeOperator(Operator.DIVIDE) }
-        binding.equal.setOnClickListener { pressEquals() }
-        binding.ac.setOnClickListener { pressClears() }
+        binding.equal.setOnClickListener { presenter.calculate() }
+        binding.ac.setOnClickListener { presenter.clear() }
     }
 
     override fun pressEquals() {
@@ -66,22 +67,15 @@ class MainActivity : AppCompatActivity(), PerformOperation, UpdateUi {
         }
         currentOperator = Operator.NONE
         labelString = "$savedNum"
-        updateText()
-        isLastButtonOperator = true
-    }
 
-    fun pressClears() {
-        isLastButtonOperator = false
-        currentOperator = Operator.NONE
-        labelString = "" // will contain the string that is entered in the textView
-        savedNum = 0
-        binding.display.text = "0"
+        presenter.updateText()
+        isLastButtonOperator = true
     }
 
     override fun updateText() {
         if (labelString.length > 8) {
-            pressClears()// reset calc
-            binding.display.text = "tool long"
+            presenter.clear() // reset everything to 0
+            binding.display.text = "too long"
             return
         }
 
@@ -96,6 +90,13 @@ class MainActivity : AppCompatActivity(), PerformOperation, UpdateUi {
         binding.display.text = df.format(labelInt)
     }
 
+    override fun clearScreen() {
+        isLastButtonOperator = false
+        currentOperator = Operator.NONE
+        labelString = "" // will contain the string that is entered in the textView
+        savedNum = 0
+        binding.display.text = "0"
+    }
 
     override fun pressNumber(number: Int) {
         val stringValue = number.toString()
@@ -116,6 +117,4 @@ class MainActivity : AppCompatActivity(), PerformOperation, UpdateUi {
         currentOperator = operator
         isLastButtonOperator = true
     }
-
-
 }

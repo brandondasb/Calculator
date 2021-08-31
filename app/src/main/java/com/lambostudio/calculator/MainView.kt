@@ -1,7 +1,8 @@
 package com.lambostudio.calculator
 
-interface UpdateUi {
+interface MainView {
+    fun setUpCalculator()
     fun pressNumber(number: Int)
     fun updateText()
-
+    fun clearScreen()
 }
